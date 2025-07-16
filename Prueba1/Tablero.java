@@ -3,47 +3,84 @@ package BN.Prueba1;
 import java.util.Scanner;
 
 public class Tablero {
-     static final String player1 = null;
-    static final String player2 = null;
+    // Atributos tablero
+    private int filas;
+    private int columnas;
+    private int[][] tablero;
+    private int i, j;
 
+    Scanner input = new Scanner(System.in);
 
-    public static int[][] armarTablero() {
+    // Constructor tablero
+    public Tablero(int filas, int columnas) {
+        this.filas = filas;
+        this.columnas = columnas;
+    }
 
+    // Getters
+    public int getFilas() {
+        return filas;
+    }
 
-        int[][] tablero = new int [3][3];
+    public int getColumnas() {
+        return columnas;
+    }
 
+    public int[][] getTablero() {
+        return tablero;
+    }
 
-        int fila=0 , columna = 0;
-        Scanner input = new Scanner(System.in);
+    // Setters
+    public void setFilas(int filas) {
+        this.filas = filas;
+    }
 
+    public void setColumnas(int columnas) {
+        this.columnas = columnas;
+    }
 
-       if (fila > 1 || fila < 0)  {
-        System.out.println("Error. Ingrese 0 para agua o 1 para barco");
-        } else  for (fila = 0; fila < tablero.length; fila++) {
-                System.out.println("Para fila " + fila);
-                input.nextInt();
+    public void setTablero(int[][] tablero) {
+        this.tablero = tablero;
+    }
 
+    // Crea el tablero 3×3
+    public int[][] crearTablero() {
+        tablero = new int[3][3];
+        try {
+            for (i = 0; i < 3; i++) {
+                System.out.println("Para fila " + i);
 
-                // Inner loop
-                if (columna >1 || columna <0){
-                     System.out.println("Error. Ingrese 0 para agua o 1 para barco");
-                }else for (columna = 0; columna < tablero.length; columna++) {
-                    System.out.println("Para columna " + columna);
-                    input.nextInt();
-
+                for (j = 0; j < 3; j++) {
+                    System.out.println("Para columna " + j);
+                    tablero[i][j] = input.nextInt();
 
                 }
-
-
             }
 
-
+        } catch (Exception e) {
+            System.out.println("Caracter inválido, ingressá 0 para agua o 1 para barco");
+        }
         return tablero;
-
-
     }
 
-
+    // Imprime el tablero por pantalla
+    public void mostrarTablero() {
+        System.out.println("Tablero actual:");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(tablero[i][j] + " ");
+            }
+            System.out.println();
+        }
     }
 
+    // Verifica que ingrese 0 o 1
+    public void verificarValores() {
 
+        if (i < 0 || i > 2 || j < 0 || j > 2) {
+            System.out.println("Fuera de rango, ingressá 0 para agua o 1 para barco");
+
+        }
+    }
+
+}
