@@ -4,21 +4,17 @@ package BN.Prueba1;
 public class BatallaNaval {
   public static void main(String[] args) throws Exception {
        
+       
+
         Tablero tablero = new Tablero(0, 0);
-        Turnos adivinar = new Turnos();
-
-
+        Turnos adivinar = new Turnos(tablero, 0, 0);
        
         iniciodeJuego();
         reglastablero();
         System.out.println("Player 1 arma tablero");
-        tablero.crearTablero();
+        tablero.colocarBarco();
         tablero.mostrarTablero();
-       // System.out.println("Player 2 arma tablero");
-       // tablero.crearTablero();
-       // tablero.mostrarTablero();
         adivinar.adivinarBarco();
-
 
         System.out.println("¡Juego terminado!");
     }
@@ -31,13 +27,14 @@ public class BatallaNaval {
 
 
     }
+    
     // Reglas de armado de tablero
 
-
     public static void reglastablero() {
-        String reglas = "Arma el tablero primero: ingresá 1 para barco y 0 para agua ";
+        String reglas = "Arma el tablero primero: ingresá 1 para barco, Máximo de tamaño es 3";
         System.out.println(reglas);
     }
 }
+
 
 

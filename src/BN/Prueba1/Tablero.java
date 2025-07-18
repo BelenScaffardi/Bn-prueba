@@ -7,7 +7,7 @@ public class Tablero {
     private int filas;
     private int columnas;
     private int[][] tablero;
-    private int i, j;
+    // private int i, j;
 
     Scanner input = new Scanner(System.in);
 
@@ -15,6 +15,8 @@ public class Tablero {
     public Tablero(int filas, int columnas) {
         this.filas = filas;
         this.columnas = columnas;
+        // Inicializa el tablero aquí para que siempre tenga un tamaño
+        this.tablero = new int[3][3];
     }
 
     // Getters
@@ -43,23 +45,35 @@ public class Tablero {
         this.tablero = tablero;
     }
 
-    // Crea el tablero 3×3
-    public int[][] crearTablero() {
+    // Coloca barco en el tablero 3×3
+    public int[][] colocarBarco() {
         tablero = new int[3][3];
-        try {
-            for (i = 0; i < 3; i++) {
-                System.out.println("Para fila " + i);
 
-                for (j = 0; j < 3; j++) {
-                    System.out.println("Para columna " + j);
-                    tablero[i][j] = input.nextInt();
+        System.out.println("Colocá tu barco (tamaño 1 a 3).");
+        System.out.print("Size del barco: ");
+        int size = input.nextInt();
 
-                }
-            }
-
-        } catch (Exception e) {
-            System.out.println("Caracter inválido, ingressá 0 para agua o 1 para barco");
+        if (size < 1 || size > 3) {
+            System.out.println("Tamaño inválido.");
+            return tablero;
         }
+
+        System.out.print("Fila inicial (0–2): ");
+        int fila = input.nextInt();
+        System.out.print("Columna inicial (0–2): ");
+        int columna = input.nextInt();
+
+        // Verifica que el barco no se salga del tablero
+        if (fila + size > 3 || columna + size > 3) {
+            System.out.println("El barco se sale del tablero.");
+            return tablero;
+        }
+        // Coloca el barco en el tablero
+        for (int i = 0; i < size; i++) {
+            tablero[fila][columna + i] = 1; // Asigno celdas ocupadas por el barco
+        }
+
+        System.out.println("Barco colocado correctamente.");
         return tablero;
     }
 
@@ -71,15 +85,6 @@ public class Tablero {
                 System.out.print(tablero[i][j] + " ");
             }
             System.out.println();
-        }
-    }
-
-    // Verifica que ingrese 0 o 1
-    public void verificarValores() {
-
-        if (i < 0 || i > 2 || j < 0 || j > 2) {
-            System.out.println("Fuera de rango, ingressá 0 para agua o 1 para barco");
-
         }
     }
 
