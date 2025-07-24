@@ -1,4 +1,4 @@
-package com.bss;
+package main.java.com.bss;
 
 
 public class BatallaNaval {
