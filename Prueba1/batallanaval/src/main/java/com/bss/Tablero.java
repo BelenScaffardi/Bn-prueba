@@ -1,4 +1,4 @@
-package BN.Prueba1;
+package com.bss;
 
 import java.util.Scanner;
 
@@ -7,9 +7,21 @@ public class Tablero {
     private int filas;
     private int columnas;
     private int[][] tablero;
-    // private int i, j;
+    private int size;
+
+
+    public int getSize() {
+        return size;
+    }
+
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
 
     Scanner input = new Scanner(System.in);
+
 
     // Constructor tablero
     public Tablero(int filas, int columnas) {
@@ -19,63 +31,84 @@ public class Tablero {
         this.tablero = new int[3][3];
     }
 
+
     // Getters
     public int getFilas() {
         return filas;
     }
 
+
     public int getColumnas() {
         return columnas;
     }
 
+
     public int[][] getTablero() {
         return tablero;
     }
+
 
     // Setters
     public void setFilas(int filas) {
         this.filas = filas;
     }
 
+
     public void setColumnas(int columnas) {
         this.columnas = columnas;
     }
+
 
     public void setTablero(int[][] tablero) {
         this.tablero = tablero;
     }
 
+
     // Coloca barco en el tablero 3×3
     public int[][] colocarBarco() {
         tablero = new int[3][3];
+        int fila = 0;
+        int columna = 0;
 
-        System.out.println("Colocá tu barco (tamaño 1 a 3).");
-        System.out.print("Size del barco: ");
-        int size = input.nextInt();
 
-        if (size < 1 || size > 3) {
-            System.out.println("Tamaño inválido.");
-            return tablero;
+       do{
+        System.out.println("Colocá tu barco.");
+        System.out.print("Size del barco: " );
+        size = input.nextInt();
+       
+        //Verificar que el barco tenga size como mínimo 1 y máximo 3
+        if(size <= 0 || size > 4){
+            System.out.println("Tamaño incorrecto, debe ser mínimo 1 máximo 3.");
         }
-
+       }while (size <= 0 || size >= 4);
+       
+       do {
+   
+       //Dar coordenadas del barco
         System.out.print("Fila inicial (0–2): ");
-        int fila = input.nextInt();
+        fila = input.nextInt();
         System.out.print("Columna inicial (0–2): ");
-        int columna = input.nextInt();
+        columna = input.nextInt();
+
 
         // Verifica que el barco no se salga del tablero
         if (fila + size > 3 || columna + size > 3) {
             System.out.println("El barco se sale del tablero.");
-            return tablero;
+           
         }
+    } while (fila + size > 3 || columna + size > 3);
+       
+       
         // Coloca el barco en el tablero
         for (int i = 0; i < size; i++) {
             tablero[fila][columna + i] = 1; // Asigno celdas ocupadas por el barco
         }
 
+
         System.out.println("Barco colocado correctamente.");
         return tablero;
     }
+
 
     // Imprime el tablero por pantalla
     public void mostrarTablero() {
@@ -88,4 +121,7 @@ public class Tablero {
         }
     }
 
+
 }
+
+
