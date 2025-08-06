@@ -5,7 +5,7 @@ public class BatallaNaval {
   public static void main(String[] args) throws Exception {
        
        
- int filas = 3;
+        int filas = 3;
         int columnas = 3;
         int size =0;
 

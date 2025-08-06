@@ -1,7 +1,7 @@
 package main.java.com.bss;
 
-public enum orientacionBarco {
-    
+
+    public enum OrientacionBarco {
 HORIZONTAL, VERTICAL
 }
 
