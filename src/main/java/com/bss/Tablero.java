@@ -3,6 +3,12 @@ package main.java.com.bss;
 import java.util.Scanner;
 
 public class Tablero {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
     // Atributos tablero
     private int filas;
     private int columnas;
@@ -14,7 +20,8 @@ public class Tablero {
     private int[][] tablerodeDisparos;
 
     // constructor tablero
-    public Tablero(int filas, int columnas) {
+   
+    public Tablero(int filas, int columnas, int columnaInicial, int filaInicial, int size) {
         this.filas = filas;
         this.columnas = columnas;
         this.columnaInicial = columnaInicial;
@@ -22,14 +29,8 @@ public class Tablero {
         this.size = size;
         // Inicializa el tablero aquí para que siempre tenga un tamaño
         this.tablero = new int[3][3];
-    }
-
-    // Constructor tablero de disparos
-    public Tablero(int[][] tablerodeDisparos) {
         this.tablerodeDisparos = new int[3][3];
     }
-
-   
 
     // Getters
     public int[][] getTablero() {
@@ -94,8 +95,6 @@ public class Tablero {
     // Coloca barco en el tablero 3×3
     public int[][] colocarBarco() {
         tablero = new int[3][3];
-        int fila = 0;
-        int columna = 0;
 
         do {
             System.out.println("Colocá tu barco.");
@@ -153,89 +152,98 @@ public class Tablero {
 
         switch (orientacion()) {
             case VERTICAL:
-                try {
-                     do {
-
-                    // Dar coordenadas del barco
-                    System.out.print("Ingrese fila inicial:");
-                    filaInicial = input.nextInt();
-                    while ((filaInicial + size) > tablero.length) {
-                        System.out.println("El barco se sale del tablero. Intente nuevamente");
-                        System.out.print("Fila inicial: ");
-                        filaInicial = input.nextInt();
-                    }
-
-                    System.out.print("Ingrese columna inicial: ");
-                    columnaInicial = input.nextInt();
-
-                    while (columnaInicial > (tablero.length - 1)) {
-                        System.out.println("El barco se sale del tablero. Intente nuevamente");
-                        System.out.print("Columna inicial");
-                        columnaInicial = input.nextInt();
-                    }
-                    input.nextLine();
-
-                } while ((filaInicial + size) > 3 || (columnaInicial > tablero.length));
-
-                for (int i = 0; i < size; i++) {
-                    tablero[filaInicial + i][columnaInicial] = 1;
-                }
+                asignarVertical();
                 break;
-                } catch (Exception e) {
-                    System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
-                }
-               
             case HORIZONTAL:
-            try {
-                do {
-                    // Dar coordenadas del barco
-                    System.out.print("Ingrese fila inicial:");
-                    filaInicial = input.nextInt();
-                    while (filaInicial > (tablero.length - 1)) {
-                        System.out.println("El barco se sale del tablero. Intente nuevamente");
-                        System.out.print("Fila inicial: ");
-                        filaInicial = input.nextInt();
-                    }
-
-                    System.out.print("Ingrese columna inicial: ");
-                    columnaInicial = input.nextInt();
-
-                    while ((columnaInicial + size) > tablero.length) {
-                        System.out.println("El barco se sale del tablero. Intente nuevamente");
-                        System.out.print("Columna inicial");
-                        columnaInicial = input.nextInt();
-                    }
-                    input.nextLine();
-
-                } while (filaInicial > tablero.length || (columnaInicial + size) > 3);
-
-              
-                for (int j = 0; j < size; j++) {
-                    tablero[filaInicial][columnaInicial + j] = 1;
-
-                }
+                asignarHorizontal();
                 break;
-            
-            } catch (Exception e) {
-                System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
-            }
+            default:
                 break;
-            
-                
-       
-            
         }
+
         return tablero;
 
     }
-    
+
+    public int[][] asignarVertical() {
+        try {
+            do {
+                // Dar coordenadas del barco
+                System.out.print("Ingrese fila inicial:");
+                filaInicial = input.nextInt();
+                while ((filaInicial + size) > tablero.length) {
+                    System.out.println("El barco se sale del tablero. Intente nuevamente");
+                    System.out.print("Fila inicial: ");
+                    filaInicial = input.nextInt();
+                }
+
+                System.out.print("Ingrese columna inicial: ");
+                columnaInicial = input.nextInt();
+
+                while (columnaInicial > tablero.length) {
+                    System.out.println("El barco se sale del tablero. Intente nuevamente");
+                    System.out.print("Columna inicial");
+                    columnaInicial = input.nextInt();
+                }
+                input.nextLine();
+
+            } while ((filaInicial + size) > 3 || (columnaInicial > tablero.length));
+
+            for (int i = 0; i < size; i++) {
+                tablero[filaInicial + i][columnaInicial] = 1;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
+        }
+        return tablero;
+    }
+
+    public int[][] asignarHorizontal() {
+
+        try {
+
+            do {
+
+                // Dar coordenadas del barco
+                System.out.print("Ingrese fila inicial:");
+                filaInicial = input.nextInt();
+                while (filaInicial > tablero.length) {
+                    System.out.println("El barco se sale del tablero. Intente nuevamente");
+                    System.out.print("Fila inicial: ");
+                    filaInicial = input.nextInt();
+                }
+
+                System.out.print("Ingrese columna inicial: ");
+                columnaInicial = input.nextInt();
+
+                while ((columnaInicial + size) > tablero.length) {
+                    System.out.println("El barco se sale del tablero. Intente nuevamente");
+                    System.out.print("Columna inicial");
+                    columnaInicial = input.nextInt();
+                }
+                input.nextLine();
+
+            } while (filaInicial > tablero.length || (columnaInicial + size) > 3);
+
+            System.out.println("llego case 2?");
+            for (int j = 0; j < size; j++) {
+                tablero[filaInicial][columnaInicial + j] = 1;
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
+        }
+        return tablero;
+    }
 
     // Imprime el tablero con barco colocado por pantalla
     public void mostrarTablero() {
         System.out.println("Tablero actual:");
         for (int i = 0; i < tablero.length; i++) {
             for (int j = 0; j < tablero[0].length; j++) {
-                System.out.print(tablero[i][j] + " ");
+                System.out.print(ANSI_PURPLE + tablero[i][j] + " " + ANSI_RESET);
             }
             System.out.println();
         }

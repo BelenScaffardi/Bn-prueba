@@ -3,15 +3,20 @@ package main.java.com.bss;
 import java.util.Scanner;
 
 public class Turnos {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
+
     private int[][] tablerodeDisparos;
     private Tablero TableroDelJuego;
 
     public Turnos(Tablero tableroDelJuego, int filas, int columnas, int size) {
         TableroDelJuego = tableroDelJuego;
         this.tablerodeDisparos = new int[3][3];
-    }
-
-    public Turnos(int[][] tablerodeDisparos) {
         this.tablerodeDisparos = new int[3][3];
     }
 
@@ -90,10 +95,10 @@ public class Turnos {
                         System.out.print("~ "); // No disparado
                         break;
                     case 1:
-                        System.out.print("X "); // Acierto
+                        System.out.print(ANSI_RED + "X " + ANSI_RESET); // Acierto
                         break;
                     case -1:
-                        System.out.print("O "); // Fallo
+                        System.out.print(ANSI_BLUE + "O " + ANSI_RESET); // Fallo
                         break;
                 }
             }
