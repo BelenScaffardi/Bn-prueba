@@ -153,8 +153,8 @@ public class Tablero {
 
         switch (orientacion()) {
             case VERTICAL:
-                
-                do {
+                try {
+                     do {
 
                     // Dar coordenadas del barco
                     System.out.print("Ingrese fila inicial:");
@@ -168,7 +168,7 @@ public class Tablero {
                     System.out.print("Ingrese columna inicial: ");
                     columnaInicial = input.nextInt();
 
-                    while (columnaInicial > tablero.length) {
+                    while (columnaInicial > (tablero.length - 1)) {
                         System.out.println("El barco se sale del tablero. Intente nuevamente");
                         System.out.print("Columna inicial");
                         columnaInicial = input.nextInt();
@@ -181,13 +181,17 @@ public class Tablero {
                     tablero[filaInicial + i][columnaInicial] = 1;
                 }
                 break;
+                } catch (Exception e) {
+                    System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
+                }
+               
             case HORIZONTAL:
+            try {
                 do {
-
                     // Dar coordenadas del barco
                     System.out.print("Ingrese fila inicial:");
                     filaInicial = input.nextInt();
-                    while (filaInicial > tablero.length) {
+                    while (filaInicial > (tablero.length - 1)) {
                         System.out.println("El barco se sale del tablero. Intente nuevamente");
                         System.out.print("Fila inicial: ");
                         filaInicial = input.nextInt();
@@ -205,19 +209,26 @@ public class Tablero {
 
                 } while (filaInicial > tablero.length || (columnaInicial + size) > 3);
 
-                System.out.println("llego case 2?");
+              
                 for (int j = 0; j < size; j++) {
                     tablero[filaInicial][columnaInicial + j] = 1;
 
                 }
                 break;
-            default:
+            
+            } catch (Exception e) {
+                System.out.println("Error al ingresar las coordenadas. Por favor, intente nuevamente.");
+            }
                 break;
+            
+                
+       
+            
         }
-
         return tablero;
 
     }
+    
 
     // Imprime el tablero con barco colocado por pantalla
     public void mostrarTablero() {
