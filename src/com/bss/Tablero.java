@@ -1,41 +1,52 @@
-package main.java.com.bss;
+package com.bss;
 
 import java.util.Scanner;
 
 public class Tablero {
-     public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
     // Atributos tablero
     private int filas;
     private int columnas;
     private int filaInicial;
     private int columnaInicial;
-    private int size;
+    private int sizeBarco;
 
 
-    private int[][] tableroDelJuego;
-    private int[][] tablerodeDisparos;
+    private EstadoCasilla[][] tableroDelJuego;
+    private EstadoCasilla[][] tablerodeDisparos;
+
+
+    Scanner input = new Scanner(System.in);
 
 
     // constructor tablero
-    public Tablero(int filas, int columnas, int columnaInicial, int filaInicial, int size) {
+    public Tablero(int filas, int columnas) {
         this.filas = filas;
         this.columnas = columnas;
-        this.columnaInicial = columnaInicial;
-        this.filaInicial = filaInicial;
-        this.size = size;
-        // Inicializa el tablero aquí para que siempre tenga un tamaño
-        this.tableroDelJuego = new int[3][3];
-        this.tablerodeDisparos = new int[3][3];
+        // Inicializa el tablero
+        this.tableroDelJuego = new EstadoCasilla[filas][columnas];
+        this.tablerodeDisparos = new EstadoCasilla[filas][columnas];
+
+
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                this.tableroDelJuego[i][j] = EstadoCasilla.NO_DISPARADO;
+                this.tablerodeDisparos[i][j] = EstadoCasilla.NO_DISPARADO;
+            }
+        }
+
+
     }
 
 
     // Getters
-    public int[][] getTableroDelJuego() {
+    public EstadoCasilla[][] getTableroDelJuego() {
         return tableroDelJuego;
     }
 
@@ -61,17 +72,22 @@ public class Tablero {
 
 
     public int getSize() {
-        return size;
+        return sizeBarco;
     }
 
 
-    public int[][] getTablerodeDisparos() {
+    public EstadoCasilla[][] getTablerodeDisparos() {
         return tablerodeDisparos;
     }
 
 
+    public EstadoCasilla getCasilla(int fila, int columna) {
+        return tableroDelJuego[fila][columna];
+    }
+
+
     // Setters
-    public void setTableroDelJuego(int[][] tableroDelJuego) {
+    public void setTableroDelJuego(EstadoCasilla[][] tableroDelJuego) {
         this.tableroDelJuego = tableroDelJuego;
     }
 
@@ -96,39 +112,40 @@ public class Tablero {
     }
 
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setSize(int sizeBarco) {
+        this.sizeBarco = sizeBarco;
     }
 
 
-    public void setTablerodeDisparos(int[][] tablerodeDisparos) {
+    public void setTablerodeDisparos(EstadoCasilla[][] tablerodeDisparos) {
         this.tablerodeDisparos = tablerodeDisparos;
     }
 
 
-    Scanner input = new Scanner(System.in);
+    public void setCasilla(int fila, int columna, EstadoCasilla estado) {
+        tableroDelJuego[fila][columna] = estado;
+    }
 
 
-    // Coloca barco en el tablero 3×3
-    public int[][] colocarBarco() {
-        tableroDelJuego = new int[3][3];
+    // Coloca barco en el tablero
+    public EstadoCasilla[][] colocarBarco() {
 
 
         do {
-           
-            System.out.print("Size del barco: ");
-            size = input.nextInt();
-
-
-            // Verificar que el barco tenga size como mínimo 1 y máximo 3
-            if (size <= 0 || size > 4) {
-                System.out.println("Tamaño incorrecto, debe ser mínimo 1 máximo 3.");
+            System.out.print("Elije el tamaño de tu barco: ");
+            sizeBarco = input.nextInt();
+            // Verificar que el barco tenga size del tablero como maximo
+            if (sizeBarco <= 0 || sizeBarco > tableroDelJuego.length) {
+                System.out.println("Tamaño incorrecto. Intenta nuevamente");
             }
-        } while (size <= 0 || size >= 4);
+
+
+        } while (sizeBarco <= 0 || sizeBarco > tableroDelJuego.length - 1);
 
 
         asignarBarco();
-        System.out.println("Barco colocado correctamente.");
+
+
         return tableroDelJuego;
     }
 
@@ -136,17 +153,16 @@ public class Tablero {
     // Da orientacion al barco
 
 
-    public OrientacionBarco orientacion() {
+    public OrientacionBarco validarOrientacion() {
 
 
         boolean inputValido = false;
         OrientacionBarco orientacionElegida = null;
-        //tablero = new int[3][3];
         String orientacionUsuario;
 
 
         do {
-            System.out.println("Elige la orientación para el barco de tamaño " + size + ": (V) // (H)");
+            System.out.println("Elige la orientación para el barco de tamaño " + sizeBarco + ": (V) // (H)");
             input.nextLine();
             orientacionUsuario = input.nextLine().trim().toUpperCase(); // Leer la entrada y limpiar espacios
 
@@ -166,7 +182,8 @@ public class Tablero {
             } else {
                 System.out
                         .println("Orientación no válida. Por favor, ingresa 'V' para Vertical o 'H' para Horizontal.");
-                       
+
+
             }
         } while (!inputValido);
 
@@ -178,19 +195,24 @@ public class Tablero {
 
 
     // asigna barco
-    public int[][] asignarBarco() {
+    public EstadoCasilla[][] asignarBarco() {
 
 
-        switch (orientacion()) {
+        switch (validarOrientacion()) {
             case VERTICAL:
+                validarVertical();
                 asignarVertical();
                 break;
             case HORIZONTAL:
+                validarHorizontal();
                 asignarHorizontal();
                 break;
             default:
                 break;
         }
+
+
+        System.out.println("Barco colocado correctamente.");
 
 
         return tableroDelJuego;
@@ -199,13 +221,13 @@ public class Tablero {
     }
 
 
-    public int[][] asignarVertical() {
+    public EstadoCasilla[][] validarVertical() {
         try {
             do {
                 // Dar coordenadas del barco
                 System.out.print("Ingrese fila inicial:");
                 filaInicial = input.nextInt();
-                while ((filaInicial + size) > tableroDelJuego.length) {
+                while ((filaInicial + sizeBarco) > tableroDelJuego.length - 1) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Fila inicial: ");
                     filaInicial = input.nextInt();
@@ -216,7 +238,7 @@ public class Tablero {
                 columnaInicial = input.nextInt();
 
 
-                while (columnaInicial > tableroDelJuego.length) {
+                while (columnaInicial > tableroDelJuego.length - 1) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Columna inicial: ");
                     columnaInicial = input.nextInt();
@@ -224,12 +246,8 @@ public class Tablero {
                 input.nextLine();
 
 
-            } while ((filaInicial + size) > 3 || (columnaInicial > tableroDelJuego.length));
-
-
-            for (int i = 0; i < size; i++) {
-                tableroDelJuego[filaInicial + i][columnaInicial] = 1;
-            }
+            } while ((filaInicial + sizeBarco) > tableroDelJuego.length - 1
+                    || (columnaInicial > tableroDelJuego.length - 1));
 
 
         } catch (Exception e) {
@@ -239,12 +257,31 @@ public class Tablero {
     }
 
 
-    public int[][] asignarHorizontal() {
+    public EstadoCasilla[][] asignarVertical() {
+        boolean hayBarco = false;
+        // chequeo si ya hay un barco en esa posicion
+        for (int i = 0; i < getSize(); i++) {
+            if (tableroDelJuego[filaInicial + i][columnaInicial] == EstadoCasilla.BARCO) {
+                System.out.println("Ya hay un barco en esa posición. Elije otra.");
+                hayBarco = true;
+                validarVertical();
+            } else
+                hayBarco = false;
+        }
+        // si no hay barco, asigno nuevo barco
+        if (hayBarco == false) {
+            for (int i = 0; i < sizeBarco; i++) {
+                tableroDelJuego[filaInicial + i][columnaInicial] = EstadoCasilla.BARCO;
+            }
+        }
+        return tableroDelJuego;
+    }
+
+
+    public EstadoCasilla[][] validarHorizontal() {
 
 
         try {
-
-
             do {
 
 
@@ -262,9 +299,7 @@ public class Tablero {
                 columnaInicial = input.nextInt();
 
 
-
-
-                while ((columnaInicial + size) > tableroDelJuego.length) {
+                while ((columnaInicial + sizeBarco) > tableroDelJuego.length - 1) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Columna inicial: ");
                     columnaInicial = input.nextInt();
@@ -272,15 +307,8 @@ public class Tablero {
                 input.nextLine();
 
 
-            } while (filaInicial > tableroDelJuego.length || (columnaInicial + size) > 3);
-
-
-           
-            for (int j = 0; j < size; j++) {
-                tableroDelJuego[filaInicial][columnaInicial + j] = 1;
-
-
-            }
+            } while (filaInicial > tableroDelJuego.length - 1
+                    || (columnaInicial + sizeBarco) > tableroDelJuego.length - 1);
 
 
         } catch (Exception e) {
@@ -290,12 +318,48 @@ public class Tablero {
     }
 
 
+    public EstadoCasilla[][] asignarHorizontal() {
+        boolean hayBarco = false;
+        // chequeo si ya hay un barco en esa posicion
+        for (int j = 0; j < getSize(); j++) {
+            if (tableroDelJuego[filaInicial][columnaInicial + j] == EstadoCasilla.BARCO) {
+                System.out.println("Ya hay un barco en esa posición. Elije otra.");
+                hayBarco = true;
+                validarHorizontal();
+            } else
+                hayBarco = false;
+        }
+        // si no hay barco, asigno barco nuevo
+        if (hayBarco == false) {
+            for (int j = 0; j < sizeBarco; j++) {
+                tableroDelJuego[filaInicial][columnaInicial + j] = EstadoCasilla.BARCO;
+            }
+        }
+        return tableroDelJuego;
+
+
+    }
+
+
     // Imprime el tablero con barco colocado por pantalla
     public void mostrarTablero() {
         System.out.println("Tablero actual:");
         for (int i = 0; i < tableroDelJuego.length; i++) {
             for (int j = 0; j < tableroDelJuego[0].length; j++) {
-                System.out.print( tableroDelJuego[i][j] + " " );
+                // System.out.print(tableroDelJuego[i][j] + " ");
+                switch (tableroDelJuego[i][j]) {
+                    case NO_DISPARADO:
+                        System.out.print(ANSI_BLUE + "~ " + ANSI_RESET);
+                        break;
+                    case BARCO:
+                        System.out.print(ANSI_RED + "B " + ANSI_RESET);
+                        break;
+                    default:
+                        System.out.print("? ");
+                        break;
+                }
+
+
             }
             System.out.println();
         }
@@ -303,5 +367,6 @@ public class Tablero {
 
 
 }
+
 
 
