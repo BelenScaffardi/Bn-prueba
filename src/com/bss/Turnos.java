@@ -21,7 +21,8 @@ public class Turnos {
     boolean ganaste = false;
     int tocadoP2 = 0;
     int tocadoP1 = 0;
-
+    int cantidadBarcosP1;
+    int cantidadBarcosP2;
 
     Scanner input = new Scanner(System.in);
 
@@ -36,14 +37,15 @@ public class Turnos {
 
 
     public Turnos(Tablero tableroPlayer1, Tablero tablerodeDisparosPlayer1, Tablero tableroPlayer2,
-            Tablero tablerodeDisparosPlayer2) {
+            Tablero tablerodeDisparosPlayer2, int cantidadBarcosP1, int cantidadBarcosP2    ) {
         this.tableroPlayer1 = tableroPlayer1;
         this.tablerodeDisparosPlayer1 = tablerodeDisparosPlayer1;
         this.tableroPlayer2 = tableroPlayer2;
         this.tableroDeDisparosPlayer2 = tablerodeDisparosPlayer2;
         this.hundidoP1 = this.tableroPlayer2.getSize();
         this.hundidoP2 = this.tableroPlayer1.getSize();
-
+        this.cantidadBarcosP1 = this.tableroPlayer1.getCantidadBarcos();
+        this.cantidadBarcosP2 = this.tableroPlayer2.getCantidadBarcos();
 
     }
 
@@ -79,7 +81,7 @@ public class Turnos {
             } while (ganaste == false);
 
 
-        } catch (Exception e) { // Captura cualquier excepción para evitar que el programa se caiga
+        } catch (Exception e) { 
             System.out.println("Ocurrió un error inesperado: " + e.getMessage());
 
 
@@ -112,17 +114,20 @@ public class Turnos {
             QuienDispara jugador) {
         if (tableroOponente.getCasilla(fila, columna) == EstadoCasilla.BARCO) {
             tableroDeDisparosActual.setCasilla(fila, columna, EstadoCasilla.TOCADO);
+
             if (quienDispara() == QuienDispara.PLAYER_1) {
-
-
                 tocadoP2++;
 
-
                 if (tocadoP2 == tableroPlayer2.getSize()) {
-                    ganaste = true;
+                    
                     System.out.println(ANSI_YELLOW + "hundiste el barco de tamaño " + tableroPlayer2.getSize() );
+                    cantidadBarcosP2--;
+                    System.out.println(ANSI_YELLOW + "Te falntan hundir " + cantidadBarcosP2 + " barcos.");
 
-
+                    if (cantidadBarcosP2 <= 0) {
+                        ganaste = true;
+                        System.out.println(ANSI_YELLOW + "Ganaste!! :) " + ANSI_RESET);
+                    }
                 } else {
                     tableroDeDisparosActual.getTableroDelJuego()[fila][columna] = EstadoCasilla.TOCADO;
                     System.out.println("¡Tocado! Te falta encontrar " + (tableroPlayer2.getSize() - tocadoP2)
@@ -131,10 +136,16 @@ public class Turnos {
             } else {
                 tocadoP1++;
 
-
                 if (tocadoP1 == tableroPlayer1.getSize()) {
-                    ganaste = true;
+                    cantidadBarcosP1--;
                     System.out.println(ANSI_YELLOW + "hundiste el barco de tamaño " + tableroPlayer1.getSize());
+                    System.out.println(ANSI_YELLOW + "Te faltan hundir " + cantidadBarcosP1 + " barcos.");
+
+                    if (cantidadBarcosP1 <= 0) {
+                        ganaste = true;
+                        System.out.println(ANSI_YELLOW + "Ganaste!! :) " + ANSI_RESET);
+                        
+                    }
                  
                 } else {
                     System.out.println(
@@ -149,8 +160,9 @@ public class Turnos {
             tableroDeDisparosActual.setCasilla(fila, columna, EstadoCasilla.AGUA);
             System.out.println("¡Agua! Fallaste.");
         }
-    }
+    
 
+    }
 
     public void validarDisparo(Tablero tableroOponente, Tablero tableroDeDisparosActual) {
     int fila;
@@ -172,16 +184,12 @@ public class Turnos {
             System.out.print("Ingresá un número de columna para encontrar el barco: ");
             columna = input.nextInt();
 
-
-            // 1. Validar que las coordenadas estén dentro del tablero
             if (columna < 0 || columna >= tableroOponente.getColumnas()) {
                 System.out.println("Coordenada fuera del rango. Intentá de nuevo.");
                 input.nextInt();
             }
            
-
-
-            // 2. Validar que la casilla no haya sido disparada antes
+      
             if (tableroDeDisparosActual.getCasilla(fila, columna) != EstadoCasilla.NO_DISPARADO) {
                 System.out.println("Ya has intentado esta posición. Elige otra.");
             }

@@ -16,6 +16,7 @@ public class Tablero {
     private int filaInicial;
     private int columnaInicial;
     private int sizeBarco;
+    private int cantidadBarcos;
 
 
     private EstadoCasilla[][] tableroDelJuego;
@@ -26,9 +27,10 @@ public class Tablero {
 
 
     // constructor tablero
-    public Tablero(int filas, int columnas) {
+    public Tablero(int filas, int columnas, int cantidadBarcos) {
         this.filas = filas;
         this.columnas = columnas;
+        this.cantidadBarcos = cantidadBarcos;
         // Inicializa el tablero
         this.tableroDelJuego = new EstadoCasilla[filas][columnas];
         this.tablerodeDisparos = new EstadoCasilla[filas][columnas];
@@ -53,6 +55,9 @@ public class Tablero {
 
     public int getFilas() {
         return filas;
+    }
+    public int getCantidadBarcos() {
+        return cantidadBarcos;
     }
 
 
