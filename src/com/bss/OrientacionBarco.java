@@ -1,8 +1,5 @@
 package com.bss;
 
-
-    public enum OrientacionBarco {
-HORIZONTAL, VERTICAL
+public enum OrientacionBarco {
+    HORIZONTAL, VERTICAL
 }
-
-

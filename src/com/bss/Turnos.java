@@ -1,5 +1,6 @@
 package com.bss;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Turnos {
@@ -21,8 +22,7 @@ public class Turnos {
     boolean ganaste = false;
     int tocadoP2 = 0;
     int tocadoP1 = 0;
-    int cantidadBarcosP1;
-    int cantidadBarcosP2;
+
 
     Scanner input = new Scanner(System.in);
 
@@ -34,18 +34,20 @@ public class Turnos {
     Tablero tableroDeDisparosPlayer2;
     Tablero tableroOponente;
     Tablero tableroDeDisparosActual;
+    Tablero listaBarcos;
 
 
     public Turnos(Tablero tableroPlayer1, Tablero tablerodeDisparosPlayer1, Tablero tableroPlayer2,
-            Tablero tablerodeDisparosPlayer2, int cantidadBarcosP1, int cantidadBarcosP2    ) {
+            Tablero tablerodeDisparosPlayer2) {
         this.tableroPlayer1 = tableroPlayer1;
         this.tablerodeDisparosPlayer1 = tablerodeDisparosPlayer1;
         this.tableroPlayer2 = tableroPlayer2;
         this.tableroDeDisparosPlayer2 = tablerodeDisparosPlayer2;
+
+
         this.hundidoP1 = this.tableroPlayer2.getSize();
         this.hundidoP2 = this.tableroPlayer1.getSize();
-        this.cantidadBarcosP1 = this.tableroPlayer1.getCantidadBarcos();
-        this.cantidadBarcosP2 = this.tableroPlayer2.getCantidadBarcos();
+
 
     }
 
@@ -59,7 +61,7 @@ public class Turnos {
                     System.out.println(ANSI_GREEN + "\n--- Turno del Jugador 1 ---");
                     do {
                         validarDisparo(tableroOponente, tableroDeDisparosActual);
-                        disparar(fila, columna, tableroOponente, tableroDeDisparosActual, null);
+                        disparar(fila, columna, tableroOponente, tableroDeDisparosActual, null, columna);
                         imprimirTableroDeDisparos();
                         esTurnoJugador1 = false;
 
@@ -71,7 +73,7 @@ public class Turnos {
                     System.out.println(ANSI_PURPLE + "\n--- Turno del Jugador 2 ---");
                     do {
                         validarDisparo(tableroOponente, tableroDeDisparosActual);
-                        disparar(fila, columna, tableroOponente, tableroDeDisparosActual, null);
+                        disparar(fila, columna, tableroOponente, tableroDeDisparosActual, null, columna);
                         imprimirTableroDeDisparos();
                         esTurnoJugador1 = true;
                     } while (esTurnoJugador1 == false);
@@ -81,7 +83,7 @@ public class Turnos {
             } while (ganaste == false);
 
 
-        } catch (Exception e) { 
+        } catch (Exception e) { // Captura cualquier excepción para evitar que el programa se caiga
             System.out.println("Ocurrió un error inesperado: " + e.getMessage());
 
 
@@ -110,49 +112,67 @@ public class Turnos {
     }
 
 
+    //evalúa si se encontró barco, cantidad de golpes y si se hundió. Evalúa si se hundieron todos los barcos.
     private void disparar(int fila, int columna, Tablero tableroOponente, Tablero tableroDeDisparosActual,
-            QuienDispara jugador) {
+            QuienDispara jugador, int barco) {
+
+
         if (tableroOponente.getCasilla(fila, columna) == EstadoCasilla.BARCO) {
             tableroDeDisparosActual.setCasilla(fila, columna, EstadoCasilla.TOCADO);
 
+
             if (quienDispara() == QuienDispara.PLAYER_1) {
-                tocadoP2++;
-
-                if (tocadoP2 == tableroPlayer2.getSize()) {
-                    
-                    System.out.println(ANSI_YELLOW + "hundiste el barco de tamaño " + tableroPlayer2.getSize() );
-                    cantidadBarcosP2--;
-                    System.out.println(ANSI_YELLOW + "Te falntan hundir " + cantidadBarcosP2 + " barcos.");
-
-                    if (cantidadBarcosP2 <= 0) {
-                        ganaste = true;
-                        System.out.println(ANSI_YELLOW + "Ganaste!! :) " + ANSI_RESET);
+                 Barco barcoTocadoP2 = buscarBarcoEnCoordenada(fila, columna, tableroOponente.getBarcosJugador());
+                    if (barcoTocadoP2 != null) {
+                        barcoTocadoP2.registrarGolpe();
+                        System.out.println("Barco tocado!");
                     }
+
+
+
+
+                if (barcoTocadoP2.estaHundido()) {
+                    System.out.println(ANSI_YELLOW + "Hundiste el barco de tamaño " + barcoTocadoP2.getTamanio());
+                    tableroOponente.getBarcosJugador().remove(barcoTocadoP2);
+                    if (tableroOponente.getBarcosJugador().isEmpty()) {
+                        ganaste = true;
+                        System.out.println("Felicitaciones Player 1. Ganaste!");
+                    }
+
+
                 } else {
                     tableroDeDisparosActual.getTableroDelJuego()[fila][columna] = EstadoCasilla.TOCADO;
-                    System.out.println("¡Tocado! Te falta encontrar " + (tableroPlayer2.getSize() - tocadoP2)
-                            + " casillas.");
+                   
+                    System.out.println("Faltan " + (barcoTocadoP2.getTamanio() - barcoTocadoP2.getGolpesRecibidos()) + " golpes para hundirlo.");
                 }
+
+
             } else {
-                tocadoP1++;
+                Barco barcoTocadoP1 = buscarBarcoEnCoordenada(fila, columna, tableroOponente.getBarcosJugador());
 
-                if (tocadoP1 == tableroPlayer1.getSize()) {
-                    cantidadBarcosP1--;
-                    System.out.println(ANSI_YELLOW + "hundiste el barco de tamaño " + tableroPlayer1.getSize());
-                    System.out.println(ANSI_YELLOW + "Te faltan hundir " + cantidadBarcosP1 + " barcos.");
 
-                    if (cantidadBarcosP1 <= 0) {
-                        ganaste = true;
-                        System.out.println(ANSI_YELLOW + "Ganaste!! :) " + ANSI_RESET);
-                        
+                if (barcoTocadoP1 != null) {
+                        barcoTocadoP1.registrarGolpe();
+                        System.out.println("Barco tocado!");
                     }
-                 
+
+
+
+
+                if (barcoTocadoP1.estaHundido()) {
+                    System.out.println(ANSI_YELLOW + "Hundiste el barco de tamaño " + barcoTocadoP1.getTamanio());
+                    tableroOponente.getBarcosJugador().remove(barcoTocadoP1);
+                    if (tableroOponente.getBarcosJugador().isEmpty()) {
+                        ganaste = true;
+                        System.out.println("Felicitaciones Player 2. Ganaste!");
+                    }
+
+
                 } else {
-                    System.out.println(
-                            "¡Tocado! Te falta encontrar " + (tableroPlayer1.getSize() - tocadoP1) + " casillas");
+                    tableroDeDisparosActual.getTableroDelJuego()[fila][columna] = EstadoCasilla.TOCADO;
+                   
+                    System.out.println("Faltan " + (barcoTocadoP1.getTamanio() - barcoTocadoP1.getGolpesRecibidos()) + " golpes para hundirlo.");
                 }
-
-
             }
 
 
@@ -160,56 +180,70 @@ public class Turnos {
             tableroDeDisparosActual.setCasilla(fila, columna, EstadoCasilla.AGUA);
             System.out.println("¡Agua! Fallaste.");
         }
-    
-
     }
 
+
+    //valida que las coordenadas ingresadas esten dentro del rango, no se haya intentado antes y sean números
     public void validarDisparo(Tablero tableroOponente, Tablero tableroDeDisparosActual) {
-    int fila;
-    int columna;
-    boolean disparoValido = false;
+        int fila;
+        int columna;
+        boolean disparoValido = false;
 
 
-    do {
-        try {
-            System.out.print("Ingresá un número de fila para encontrar el barco: ");
-            fila = input.nextInt();
-            if (fila < 0 || fila >= tableroOponente.getFilas() ) {
-                System.out.println("Coordenada fuera del rango. Intentá de nuevo.");
-                input.nextInt();
+        do {
+            try {
+                System.out.print("Ingresá un número de fila para encontrar el barco: ");
+                fila = BatallaNaval.leerEnteroValido() - 1;
+                if (fila < 0 || fila >= tableroOponente.getFilas()) {
+                    System.out.println("Coordenada fuera del rango. Intentá de nuevo.");
+                    fila = BatallaNaval.leerEnteroValido();
+                }
+
+
+                System.out.print("Ingresá un número de columna para encontrar el barco: ");
+                columna = BatallaNaval.leerEnteroValido() - 1;
+
+
+                if (columna < 0 || columna >= tableroOponente.getColumnas()) {
+                    System.out.println("Coordenada fuera del rango. Intentá de nuevo.");
+                    columna = BatallaNaval.leerEnteroValido() - 1;
+                }
+
+
+                if (tableroDeDisparosActual.getCasilla(fila, columna) != EstadoCasilla.NO_DISPARADO) {
+                    System.out.println("Ya has intentado esta posición. Elige otra.");
+                }
+
+
+                else {
+                    this.fila = fila;
+                    this.columna = columna;
+                    disparoValido = true;
+                }
+            } catch (Exception e) {
+                System.out.println("Entrada no válida. Por favor, ingresa un número.");
+                input.nextLine();
+            }
+        } while (!disparoValido);
+    }
+
+
+    // buscar el barco en las coordenadas
+    private Barco buscarBarcoEnCoordenada(int fila, int columna, ArrayList<Barco> listaBarcos) {
+        for (Barco barco : listaBarcos) {
+            for (Coordenada coord : barco.getCoordenadas()) {
+                if (coord.getFila() == fila && coord.getColumna() == columna) {
+                    return barco;
+                }
             }
            
-
-
-            System.out.print("Ingresá un número de columna para encontrar el barco: ");
-            columna = input.nextInt();
-
-            if (columna < 0 || columna >= tableroOponente.getColumnas()) {
-                System.out.println("Coordenada fuera del rango. Intentá de nuevo.");
-                input.nextInt();
-            }
-           
-      
-            if (tableroDeDisparosActual.getCasilla(fila, columna) != EstadoCasilla.NO_DISPARADO) {
-                System.out.println("Ya has intentado esta posición. Elige otra.");
-            }
-            // 3. Si las coordenadas son válidas, salir del bucle
-            else {
-                this.fila = fila; // Asigna las coordenadas validadas
-                this.columna = columna;
-                disparoValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Entrada no válida. Por favor, ingresa un número.");
-            input.nextLine(); // Limpiar el buffer del scanner
         }
-    } while (!disparoValido);
-}
+       return null;
+    }
 
 
-    // Método para imprimir el tablero de disparos del jugador
+    // imprimir el tablero de disparos del jugador
     public void imprimirTableroDeDisparos() {
-       
 
 
         System.out.println(ANSI_RESET + "\n--- Tu Tablero de Disparos ---");
@@ -227,7 +261,7 @@ public class Turnos {
                         System.out.print(ANSI_RED + "X " + ANSI_RESET); // Acierto
                         break;
                     case AGUA:
-                        System.out.print( ANSI_BLUE + "0 " + ANSI_RESET ); // Fallo
+                        System.out.print(ANSI_BLUE + "0 " + ANSI_RESET); // Fallo
                         break;
                     default:
                         System.out.println("Ocurrió un error");
@@ -236,14 +270,13 @@ public class Turnos {
 
                 }
             }
-            System.out.println(); // Nueva línea para la siguiente fila
+            System.out.println(); 
         }
         System.out.println("------------------------------\n");
 
 
     }
 }
-
 
 
 

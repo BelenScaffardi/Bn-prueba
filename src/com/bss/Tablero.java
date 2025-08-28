@@ -1,5 +1,6 @@
 package com.bss;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Tablero {
@@ -23,15 +24,20 @@ public class Tablero {
     private EstadoCasilla[][] tablerodeDisparos;
 
 
+    private BatallaNaval leerEnteroValido;
+
+
     Scanner input = new Scanner(System.in);
 
 
+    private ArrayList<Barco> barcosJugador;
+
+
     // constructor tablero
-    public Tablero(int filas, int columnas, int cantidadBarcos) {
+    public Tablero(int filas, int columnas) {
         this.filas = filas;
         this.columnas = columnas;
-        this.cantidadBarcos = cantidadBarcos;
-        // Inicializa el tablero
+        this.barcosJugador = new ArrayList<>();
         this.tableroDelJuego = new EstadoCasilla[filas][columnas];
         this.tablerodeDisparos = new EstadoCasilla[filas][columnas];
 
@@ -55,9 +61,6 @@ public class Tablero {
 
     public int getFilas() {
         return filas;
-    }
-    public int getCantidadBarcos() {
-        return cantidadBarcos;
     }
 
 
@@ -88,6 +91,11 @@ public class Tablero {
 
     public EstadoCasilla getCasilla(int fila, int columna) {
         return tableroDelJuego[fila][columna];
+    }
+
+
+    public ArrayList<Barco> getBarcosJugador() {
+        return barcosJugador;
     }
 
 
@@ -132,26 +140,47 @@ public class Tablero {
     }
 
 
-    // Coloca barco en el tablero
-    public EstadoCasilla[][] colocarBarco() {
+    public ArrayList<Barco> elegirCantidadBarcos() {
 
 
+        int cantidadBarcos = BatallaNaval.leerEnteroValido();
+        System.out.println("Elegiste colocar " + cantidadBarcos + "barcos");
+
+
+        for (int i = 0; i < cantidadBarcos; i++) {
+            System.out.println("Ingresá el tamaño del barco N°" + (i + 1) + ":");
+            int sizeBarco = validaTamanioBarco();
+            this.sizeBarco = sizeBarco;
+            asignarBarco();
+            mostrarTablero();
+
+
+        }
+
+
+        return barcosJugador;
+    }
+
+
+    public void agregarBarco(Barco barco) {
+        this.barcosJugador.add(barco);
+    }
+
+
+    public int validaTamanioBarco() {
         do {
-            System.out.print("Elije el tamaño de tu barco: ");
-            sizeBarco = input.nextInt();
+            sizeBarco = BatallaNaval.leerEnteroValido();
             // Verificar que el barco tenga size del tablero como maximo
             if (sizeBarco <= 0 || sizeBarco > tableroDelJuego.length) {
                 System.out.println("Tamaño incorrecto. Intenta nuevamente");
+                sizeBarco = input.nextInt();
             }
 
 
-        } while (sizeBarco <= 0 || sizeBarco > tableroDelJuego.length - 1);
+        } while (sizeBarco <= 0 || sizeBarco > tableroDelJuego.length);
 
 
-        asignarBarco();
-
-
-        return tableroDelJuego;
+        return sizeBarco;
     }
 
 
@@ -168,8 +197,8 @@ public class Tablero {
 
         do {
             System.out.println("Elige la orientación para el barco de tamaño " + sizeBarco + ": (V) // (H)");
-            input.nextLine();
-            orientacionUsuario = input.nextLine().trim().toUpperCase(); // Leer la entrada y limpiar espacios
+             //input.nextLine();
+            orientacionUsuario = input.nextLine().trim().toUpperCase(); 
 
 
             if (orientacionUsuario.equals("V")) {
@@ -201,16 +230,15 @@ public class Tablero {
 
     // asigna barco
     public EstadoCasilla[][] asignarBarco() {
-
-
+        Barco nuevoBarco = new Barco(sizeBarco);
         switch (validarOrientacion()) {
             case VERTICAL:
                 validarVertical();
-                asignarVertical();
+                asignarVertical(nuevoBarco);
                 break;
             case HORIZONTAL:
                 validarHorizontal();
-                asignarHorizontal();
+                asignarHorizontal(nuevoBarco);
                 break;
             default:
                 break;
@@ -231,28 +259,31 @@ public class Tablero {
             do {
                 // Dar coordenadas del barco
                 System.out.print("Ingrese fila inicial:");
-                filaInicial = input.nextInt();
-                while ((filaInicial + sizeBarco) > tableroDelJuego.length - 1) {
-                    System.out.println("El barco se sale del tablero. Intente nuevamente");
+                filaInicial = BatallaNaval.leerEnteroValido() - 1;
+                while ((filaInicial + sizeBarco) > tableroDelJuego.length || filaInicial < 0) {
+
+
+                    System.out.println("El barco se sale del tablero. Intente nuevamente.");
                     System.out.print("Fila inicial: ");
-                    filaInicial = input.nextInt();
+                    filaInicial = BatallaNaval.leerEnteroValido() - 1;
+
+
                 }
 
 
                 System.out.print("Ingrese columna inicial: ");
-                columnaInicial = input.nextInt();
+                columnaInicial = BatallaNaval.leerEnteroValido() - 1;
 
 
-                while (columnaInicial > tableroDelJuego.length - 1) {
+                while (columnaInicial > tableroDelJuego.length || columnaInicial < 0) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Columna inicial: ");
-                    columnaInicial = input.nextInt();
+                    columnaInicial = BatallaNaval.leerEnteroValido() - 1;
                 }
-                input.nextLine();
 
 
-            } while ((filaInicial + sizeBarco) > tableroDelJuego.length - 1
-                    || (columnaInicial > tableroDelJuego.length - 1));
+            } while ((filaInicial + sizeBarco) > tableroDelJuego.length
+                    || (columnaInicial > tableroDelJuego.length));
 
 
         } catch (Exception e) {
@@ -262,7 +293,7 @@ public class Tablero {
     }
 
 
-    public EstadoCasilla[][] asignarVertical() {
+    public EstadoCasilla[][] asignarVertical(Barco barco) {
         boolean hayBarco = false;
         // chequeo si ya hay un barco en esa posicion
         for (int i = 0; i < getSize(); i++) {
@@ -277,7 +308,13 @@ public class Tablero {
         if (hayBarco == false) {
             for (int i = 0; i < sizeBarco; i++) {
                 tableroDelJuego[filaInicial + i][columnaInicial] = EstadoCasilla.BARCO;
+                barco.agregarCoordenada(filaInicial + i, columnaInicial);
             }
+
+
+            agregarBarco(barco);
+
+
         }
         return tableroDelJuego;
     }
@@ -292,28 +329,27 @@ public class Tablero {
 
                 // Dar coordenadas del barco
                 System.out.print("Ingrese fila inicial:");
-                filaInicial = input.nextInt();
-                while (filaInicial > tableroDelJuego.length) {
+                filaInicial = BatallaNaval.leerEnteroValido() - 1;
+                while (filaInicial > tableroDelJuego.length || filaInicial < 0) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Fila inicial: ");
-                    filaInicial = input.nextInt();
+                    filaInicial = BatallaNaval.leerEnteroValido() - 1;
                 }
 
 
                 System.out.print("Ingrese columna inicial: ");
-                columnaInicial = input.nextInt();
+                columnaInicial = BatallaNaval.leerEnteroValido() - 1;
 
 
-                while ((columnaInicial + sizeBarco) > tableroDelJuego.length - 1) {
+                while ((columnaInicial + sizeBarco) > tableroDelJuego.length || columnaInicial < 0) {
                     System.out.println("El barco se sale del tablero. Intente nuevamente");
                     System.out.print("Columna inicial: ");
-                    columnaInicial = input.nextInt();
+                    columnaInicial = BatallaNaval.leerEnteroValido() - 1;
                 }
-                input.nextLine();
 
 
-            } while (filaInicial > tableroDelJuego.length - 1
-                    || (columnaInicial + sizeBarco) > tableroDelJuego.length - 1);
+            } while (filaInicial > tableroDelJuego.length
+                    || (columnaInicial + sizeBarco) > tableroDelJuego.length);
 
 
         } catch (Exception e) {
@@ -323,7 +359,7 @@ public class Tablero {
     }
 
 
-    public EstadoCasilla[][] asignarHorizontal() {
+    public EstadoCasilla[][] asignarHorizontal(Barco barco) {
         boolean hayBarco = false;
         // chequeo si ya hay un barco en esa posicion
         for (int j = 0; j < getSize(); j++) {
@@ -338,7 +374,11 @@ public class Tablero {
         if (hayBarco == false) {
             for (int j = 0; j < sizeBarco; j++) {
                 tableroDelJuego[filaInicial][columnaInicial + j] = EstadoCasilla.BARCO;
+                barco.agregarCoordenada(filaInicial, columnaInicial + j);
             }
+            agregarBarco(barco);
+
+
         }
         return tableroDelJuego;
 
@@ -346,12 +386,12 @@ public class Tablero {
     }
 
 
-    // Imprime el tablero con barco colocado por pantalla
     public void mostrarTablero() {
         System.out.println("Tablero actual:");
         for (int i = 0; i < tableroDelJuego.length; i++) {
             for (int j = 0; j < tableroDelJuego[0].length; j++) {
-                // System.out.print(tableroDelJuego[i][j] + " ");
+
+
                 switch (tableroDelJuego[i][j]) {
                     case NO_DISPARADO:
                         System.out.print(ANSI_BLUE + "~ " + ANSI_RESET);
